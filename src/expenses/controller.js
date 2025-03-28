@@ -8,7 +8,7 @@ const getAllExpenses = async (req, res) => {
   if (response) {
     res.status(200).json(response); // ✅ Використовуй res.json()
   } else {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
@@ -32,7 +32,7 @@ const addNewExpense = async (req, res) => {
       const response = await expensesService.addNew(expObject);
 
       if (response) {
-        res.status(201).send(JSON.stringify(response));
+        res.status(201).json(response);
       } else {
         res.status(500).send('Server error');
       }
@@ -47,7 +47,7 @@ const findExpense = async (req, res) => {
     const expenseId = req.params.id;
 
     if (!expenseId) {
-      res.status(400).send('Invalid request data');
+      res.status(400).json('Invalid request data');
 
       return;
     }
@@ -55,12 +55,12 @@ const findExpense = async (req, res) => {
     const response = await expensesService.getOneExpense(expenseId);
 
     if (!response) {
-      res.status(404).send('Expense bot found');
+      res.status(404).json('Expense bot found');
     } else {
-      res.status(200).send(response);
+      res.status(200).json(response);
     }
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
@@ -69,7 +69,7 @@ const removeExpense = async (req, res) => {
     const removeId = req.params.id;
 
     if (!removeId) {
-      res.status(400).send('Invalid data request');
+      res.status(400).json('Invalid data request');
 
       return;
     }
@@ -77,12 +77,12 @@ const removeExpense = async (req, res) => {
     const response = await expensesService.deleteExpense(removeId);
 
     if (!response) {
-      res.send(404).send('Expense not found');
+      res.send(404).json('Expense not found');
     } else {
-      res.status(201).send('Deleted');
+      res.status(201).json('Deleted');
     }
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
@@ -94,7 +94,7 @@ const changeExpense = async (req, res) => {
     const isValid = expenseKeys.every((key) => expenseBody.hasOwnProperty(key));
 
     if (!expenseId || !isValid) {
-      res.status(400).send('Invalid request data');
+      res.status(400).json('Invalid request data');
 
       return;
     }
@@ -105,12 +105,12 @@ const changeExpense = async (req, res) => {
     );
 
     if (!response) {
-      res.status(404).send('Expense not found');
+      res.status(404).json('Expense not found');
     } else {
-      res.status(200).send(response);
+      res.status(200).json(response);
     }
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 

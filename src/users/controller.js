@@ -1,79 +1,88 @@
 const { usersService } = require('./service');
 
 const getAll = async (req, res) => {
-  const todos = await usersService.getAll();
+  const users = await usersService.getAll();
 
-  res.json(todos);
+  res.status(200).json(users || []);
 };
 
 const addUser = async (req, res) => {
   const userName = req.body.name;
 
   if (!userName || typeof userName !== 'string') {
-    res.status(400).send('Invalid data request');
+    res.status(400).json('Invalid data request');
+
+    return;
   }
 
   try {
-    await usersService.addUser(userName);
-    res.status(201).send('created');
+    const newUser = await usersService.addUser(userName);
+
+    res.status(201).json(newUser);
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
 const getUser = async (req, res) => {
-  const userId = req.params.id;
+  const userId = Number(req.params.id);
 
   if (!userId) {
-    res.status(400).send('Invalid request data');
+    return res.status(400).json('Invalid request data');
   }
 
   try {
-    await usersService.getUser(userId).then((user) => {
-      if (!user) {
-        res.status(404).send('User not found');
-      } else {
-        res.status(200).send(user);
-      }
-    });
+    const user = await usersService.getUser(userId);
+
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+
+    res.status(200).json(user);
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
 const removeUser = async (req, res) => {
-  const userId = req.params.id;
+  const userId = Number(req.params.id);
 
   if (!userId) {
-    res.status(400).send('Invalid request data');
+    return res.status(400).json('Invalid request data');
   }
 
   try {
+    const user = await usersService.getUser(userId);
+
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+
     await usersService.deleteUser(userId);
-    res.status(204).send('Succesfully removed');
+    res.status(204).send(); // Виправлено: тест очікує `204 No Content`
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
 const updateUser = async (req, res) => {
   const newName = req.body.name;
-  const idToUpdate = req.params.id;
+  const idToUpdate = Number(req.params.id);
 
   if (!newName || !idToUpdate) {
-    res.status(400).send('Invalid data request');
+    return res.status(400).json('Invalid data request');
   }
 
   try {
-    usersService.updateUser(idToUpdate, newName).then((user) => {
-      if (!user) {
-        res.status(404).send('User not found');
-      } else {
-        res.status(200).send(JSON.stringify(user));
-      }
-    });
+    const updatedUser = await usersService.updateUser(idToUpdate, newName);
+
+    if (!updatedUser) {
+      return res.status(404).json('User not found');
+    }
+
+    res.status(200).json(updatedUser);
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 

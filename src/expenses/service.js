@@ -1,53 +1,35 @@
-const fs = require('node:fs').promises;
-const path = require('node:path');
-const { v4: uuidv4 } = require('uuid');
+let expenses = [];
 
-const baseUrl = path.resolve(__dirname, 'expenses.json');
+const formatDate = () => {
+  const date = new Date();
 
-const formatDate = (timestamp) => {
-  const date = new Date(timestamp);
-
-  return date.toISOString().replace('T', ' ').split('.')[0];
+  return date.toISOString();
 };
 
-const getData = async () => {
-  try {
-    const data = await fs.readFile(baseUrl);
+const getMaxId = () => {
+  const ids = expenses.map((exp) => exp.id);
 
-    return JSON.parse(data);
-  } catch {
-    return undefined;
-  }
+  return expenses.length === 0 ? 1 : Math.max(...ids) + 1;
 };
 
 const expensesService = {
   async getAll() {
-    try {
-      const response = await getData();
-
-      if (response) {
-        return response;
-      } else {
-        return undefined;
-      }
-    } catch (err) {
-      throw new Error(`catch error getAll: ${err.message}`);
-    }
+    return expenses;
   },
 
   async addNew(newExpense) {
     try {
-      const currentData = await getData();
+      const currentData = [...expenses];
 
       const doneExpense = {
-        id: uuidv4(),
+        id: getMaxId(),
         ...newExpense,
-        spentAt: formatDate(Date.now()),
+        spentAt: formatDate(),
       };
 
       currentData.push(doneExpense);
 
-      await fs.writeFile(baseUrl, JSON.stringify(currentData));
+      expenses = currentData;
 
       return doneExpense;
     } catch (err) {
@@ -56,9 +38,7 @@ const expensesService = {
   },
 
   async getOneExpense(id) {
-    const currentData = await getData();
-
-    const foundExpense = currentData.find((exp) => exp.id === id);
+    const foundExpense = expenses.find((exp) => exp.id === Number(id));
 
     if (foundExpense) {
       return foundExpense;
@@ -68,34 +48,27 @@ const expensesService = {
   },
 
   async deleteExpense(id) {
-    const currentData = await getData();
-
-    const expenseToDelete = currentData.find((exp) => exp.id === id);
+    const expenseToDelete = expenses.find((exp) => exp.id === Number(id));
 
     if (!expenseToDelete) {
       return null;
     }
 
-    const newData = currentData.filter((exp) => exp.id !== id);
-
-    fs.writeFile(baseUrl, JSON.stringify(newData));
+    expenses = expenses.filter((exp) => exp.id !== Number(id));
 
     return 1;
   },
 
   async updateExpense(id, body) {
-    const currentData = await getData();
-
-    const expenseIndex = currentData.findIndex((exp) => exp.id === id);
+    const expenseIndex = expenses.findIndex((exp) => exp.id === Number(id));
 
     if (expenseIndex === -1) {
       return null;
     }
 
-    currentData[expenseIndex] = { ...currentData[expenseIndex], ...body };
-    await fs.writeFile(baseUrl, JSON.stringify(currentData));
+    expenses[expenseIndex] = { ...expenses[expenseIndex], ...body };
 
-    return currentData[expenseIndex];
+    return expenses[expenseIndex];
   },
 };
 
