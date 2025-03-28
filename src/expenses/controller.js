@@ -20,8 +20,6 @@ const addNewExpense = async (req, res) => {
 
     const isValid = expenseKeys.every((key) => newExpense.hasOwnProperty(key));
 
-    console.log(users);
-
     if (!isValid || !users.some((user) => user.id === req.body.userId)) {
       res.status(400).send('Invalid data request');
     } else {

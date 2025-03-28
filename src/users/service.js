@@ -1,9 +1,5 @@
 let users = [];
 
-const resetUsers = () => {
-  users = [];
-};
-
 const getMaxId = () => {
   const ids = users.map((u) => u.id);
 
@@ -72,4 +68,4 @@ const usersService = {
   },
 };
 
-module.exports = { usersService, resetUsers, users };
+module.exports = { usersService, users };
