@@ -1,5 +1,7 @@
 const { expensesService } = require('./service');
 
+const { users } = require('../users/service');
+
 const expenseKeys = ['userId', 'title', 'amount', 'category', 'note'];
 
 const getAllExpenses = async (req, res) => {
@@ -18,7 +20,9 @@ const addNewExpense = async (req, res) => {
 
     const isValid = expenseKeys.every((key) => newExpense.hasOwnProperty(key));
 
-    if (!isValid) {
+    console.log(users);
+
+    if (!isValid || !users.some((user) => user.id === req.body.userId)) {
       res.status(400).send('Invalid data request');
     } else {
       const expObject = {

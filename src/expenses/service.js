@@ -1,5 +1,9 @@
 let expenses = [];
 
+const resetExpenses = () => {
+  expenses = [];
+};
+
 const formatDate = () => {
   const date = new Date();
 
@@ -72,4 +76,4 @@ const expensesService = {
   },
 };
 
-module.exports = { expensesService };
+module.exports = { expensesService, resetExpenses };
