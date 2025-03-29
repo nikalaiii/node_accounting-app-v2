@@ -21,7 +21,7 @@ const addNewExpense = async (req, res) => {
     const isValid = expenseKeys.every((key) => newExpense.hasOwnProperty(key));
 
     if (!isValid || !users.some((user) => user.id === req.body.userId)) {
-      res.status(400).send('Invalid data request');
+      res.status(400).json('Invalid data request');
     } else {
       const expObject = {
         userId: req.body.userId,
@@ -36,11 +36,11 @@ const addNewExpense = async (req, res) => {
       if (response) {
         res.status(201).json(response);
       } else {
-        res.status(500).send('Server error');
+        res.status(500).json('Server error');
       }
     }
   } catch {
-    res.status(500).send('Server error');
+    res.status(500).json('Server error');
   }
 };
 
@@ -57,7 +57,7 @@ const findExpense = async (req, res) => {
     const response = await expensesService.getOneExpense(expenseId);
 
     if (!response) {
-      res.status(404).json('Expense bot found');
+      res.status(404).json('Expense not found');
     } else {
       res.status(200).json(response);
     }
@@ -79,9 +79,9 @@ const removeExpense = async (req, res) => {
     const response = await expensesService.deleteExpense(removeId);
 
     if (!response) {
-      res.send(404).json('Expense not found');
+      return res.status(404).json('Expense not found');
     } else {
-      res.status(201).json('Deleted');
+      res.status(204).send();
     }
   } catch {
     res.status(500).json('Server error');
